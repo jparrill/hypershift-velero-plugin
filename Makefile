@@ -15,7 +15,7 @@
 PKG := github.com/jparrill/hypershift-velero-plugin
 BIN := hypershift-velero-plugin
 
-REGISTRY ?= jparrill
+REGISTRY ?= quay.io/jparrill
 IMAGE    ?= $(REGISTRY)/hypershift-velero-plugin
 VERSION  ?= main
 
@@ -24,7 +24,7 @@ DOCKER_BUILD_ARGS ?= --platform=linux/$(ARCH)
 
 .PHONY: local
 local: build-dirs
-	CGO_ENABLED=0 go build -v -o _output/bin/$(BIN) .
+	CGO_ENABLED=0 GOARCH=$(ARCH) go build -v -o _output/bin/$(BIN) .
 
 .PHONY: test
 test:
@@ -33,12 +33,12 @@ test:
 .PHONY: ci
 ci: verify-modules local test
 
-.PHONY: container
-container:
+.PHONY: docker-build
+docker-build:
 	docker build -t $(IMAGE):$(VERSION) . $(DOCKER_BUILD_ARGS)
 
-.PHONY: push
-push:
+.PHONY: docker-push
+docker-push:
 	@docker push $(IMAGE):$(VERSION)
 ifeq ($(TAG_LATEST), true)
 	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest

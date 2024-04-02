@@ -46,3 +46,25 @@ func (p *RestorePlugin) AppliesTo() (velero.ResourceSelector, error) {
 		},
 	}, nil
 }
+
+// Execute sets a custom annotation on the item being restored.
+func (p *RestorePlugin) Execute(input *velero.RestoreItemActionExecuteInput) (*velero.RestoreItemActionExecuteOutput, error) {
+	p.log.Info("[common-restore] Entering Hypershift common restore plugin")
+
+	metadata, annotations, err := getMetadataAndAnnotations(input.Item)
+	if err != nil {
+		return nil, err
+	}
+	name := metadata.GetName()
+	p.log.Infof("[common-restore] common restore plugin for %s", name)
+
+	annotations[CommonRestoreAnnotationName] = string(RestoreDone)
+
+	if annotations[CommonBackupAnnotationName] != "" {
+		delete(annotations, CommonBackupAnnotationName)
+	}
+
+	metadata.SetAnnotations(annotations)
+
+	return velero.NewRestoreItemActionExecuteOutput(input.Item), nil
+}

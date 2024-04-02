@@ -8,8 +8,8 @@ import (
 
 func main() {
 	framework.NewServer().
-		RegisterObjectStore("hypershift.openshift.io/common-backup-plugin", newCommonBackupPlugin).
-		RegisterVolumeSnapshotter("hypershift.openshift.io/common-restore-plugin", newCommonRestorePlugin).
+		RegisterBackupItemAction("openshift.io/hypershift-common-backup-plugin", newCommonBackupPlugin).
+		RegisterRestoreItemAction("openshift.io/hypershift-common-restore-plugin", newCommonRestorePlugin).
 		Serve()
 }
 

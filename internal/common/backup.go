@@ -65,9 +65,11 @@ func (p *BackupPlugin) Execute(item runtime.Unstructured, backup *v1.Backup) (ru
 		annotations = make(map[string]string)
 	}
 
-	annotations[commonBackupAnnotationName] = "1"
-
-	metadata.SetAnnotations(annotations)
+	if annotations[CommonBackupAnnotationName] == "" {
+		p.log.Infof("[common-backup] Setting annotation for item, %s", metadata.GetName())
+		annotations[CommonBackupAnnotationName] = string(BackupStatusInProgress)
+		metadata.SetAnnotations(annotations)
+	}
 
 	return item, nil, nil
 }

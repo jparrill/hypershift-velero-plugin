@@ -19,7 +19,7 @@ WORKDIR $APP_ROOT/src/github.com/jparrill/hypershift-velero-plugin
 COPY go.mod go.sum $APP_ROOT/src/github.com/jparrill/hypershift-velero-plugin/
 RUN go mod download
 COPY . $APP_ROOT/src/github.com/jparrill/hypershift-velero-plugin
-RUN CGO_ENABLED=0 go build -o /go/bin/hypershift-velero-plugin .
+RUN CGO_ENABLED=0 GOARCH=amd64 go build -o /go/bin/hypershift-velero-plugin .
 
 FROM registry.access.redhat.com/ubi8-minimal AS ubi8
 COPY --from=builder /go/bin/hypershift-velero-plugin /plugins/
