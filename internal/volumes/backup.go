@@ -4,12 +4,10 @@ import (
 	"context"
 
 	commonplug "github.com/jparrill/hypershift-velero-plugin/internal/common"
-	hyperv1 "github.com/openshift/hypershift/api/hypershift/v1beta1"
 	"github.com/sirupsen/logrus"
 	v1 "github.com/vmware-tanzu/velero/pkg/apis/velero/v1"
 	"github.com/vmware-tanzu/velero/pkg/plugin/velero"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/ptr"
 )
 
 const (
@@ -59,42 +57,13 @@ func (p *BackupPlugin) Execute(item runtime.Unstructured, backup *v1.Backup) (ru
 	}
 
 	// Pausing NodePools
-	p.log.Debugf("%s Listing NodePools", logHeader)
-	nps := &hyperv1.NodePoolList{}
-	if err := client.List(ctx, nps); err != nil {
+	if err := commonplug.ManagePauseNodepools(ctx, client, p.log, "true", logHeader, backup.Spec.IncludedNamespaces); err != nil {
 		return nil, nil, err
-	}
-
-	for _, np := range nps.Items {
-		p.log.Debugf("%s Checking NodePool: %s", logHeader, np.Name)
-		if np.Spec.PausedUntil == nil {
-			p.log.Infof("%s Pausing NodePool: %s", logHeader, np.Name)
-			np.Spec.PausedUntil = ptr.To("true")
-			if err := client.Update(ctx, &np); err != nil {
-				return nil, nil, err
-			}
-		}
 	}
 
 	// Pausing HostedClusters
-	p.log.Debugf("%s Listing HostedClusters", logHeader)
-	hcs := &hyperv1.HostedClusterList{}
-	if err := client.List(ctx, hcs); err != nil {
+	if err := commonplug.ManagePauseHostedCluster(ctx, client, p.log, "true", logHeader, backup.Spec.IncludedNamespaces); err != nil {
 		return nil, nil, err
-	}
-
-	for _, hc := range hcs.Items {
-		if hc.Spec.PausedUntil == nil {
-			p.log.Infof("%s Pausing HostedCluster: %s", logHeader, hc.Name)
-			hc.Spec.PausedUntil = ptr.To("true")
-			if err := client.Update(ctx, &hc); err != nil {
-				return nil, nil, err
-			}
-
-			// Checking the hc Object to validate the propagation of the PausedUntil field
-			p.log.Debugf("%s Waiting for Pause propagation", logHeader)
-			commonplug.WaitForPausedPropagated(ctx, client, p.log, &hc)
-		}
 	}
 
 	return item, nil, nil

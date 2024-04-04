@@ -15,6 +15,7 @@ import (
 	schedulingv1alpha1 "github.com/openshift/hypershift/api/scheduling/v1alpha1"
 	operatorsv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	prometheusoperatorv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	velero "github.com/vmware-tanzu/velero/pkg/apis/velero/v2alpha1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -55,4 +56,6 @@ func init() {
 	prometheusoperatorv1.AddToScheme(CustomScheme)
 	imageregistryv1.AddToScheme(CustomScheme)
 	operatorsv1alpha1.AddToScheme(CustomScheme)
+	velero.AddToScheme(CustomScheme)
+
 }
