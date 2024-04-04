@@ -66,13 +66,11 @@ func (p *BackupPlugin) Execute(item runtime.Unstructured, backup *v1.Backup) (ru
 	}
 
 	for _, np := range nps.Items {
+		p.log.Debugf("%s Checking NodePool: %s", logHeader, np.Name)
 		if np.Spec.PausedUntil == nil {
-			p.log.Debugf("%s Pausing NodePool: %s", logHeader, np.Name)
-			if err := client.Update(ctx, &hyperv1.NodePool{
-				Spec: hyperv1.NodePoolSpec{
-					PausedUntil: ptr.To("true"),
-				},
-			}); err != nil {
+			p.log.Infof("%s Pausing NodePool: %s", logHeader, np.Name)
+			np.Spec.PausedUntil = ptr.To("true")
+			if err := client.Update(ctx, &np); err != nil {
 				return nil, nil, err
 			}
 		}
@@ -87,12 +85,9 @@ func (p *BackupPlugin) Execute(item runtime.Unstructured, backup *v1.Backup) (ru
 
 	for _, hc := range hcs.Items {
 		if hc.Spec.PausedUntil == nil {
-			p.log.Debugf("%s Pausing HostedCluster: %s", logHeader, hc.Name)
-			if err := client.Update(ctx, &hyperv1.HostedCluster{
-				Spec: hyperv1.HostedClusterSpec{
-					PausedUntil: ptr.To("true"),
-				},
-			}); err != nil {
+			p.log.Infof("%s Pausing HostedCluster: %s", logHeader, hc.Name)
+			hc.Spec.PausedUntil = ptr.To("true")
+			if err := client.Update(ctx, &hc); err != nil {
 				return nil, nil, err
 			}
 

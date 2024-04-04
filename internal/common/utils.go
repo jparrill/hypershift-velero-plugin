@@ -85,6 +85,7 @@ func WaitForPausedPropagated(ctx context.Context, client crclient.Client, log lo
 			log.Error(err, "failed to get HostedControlPlane", "namespace", hc.Namespace, "name", hc.Name)
 			return false, err
 		}
+		log.Infof("Waiting for Pause propagation to HCP", "namespace", hc.Namespace, "name", hc.Name)
 
 		if hcp.Spec.PausedUntil != nil {
 			log.Debug("HostedControlPlane is paused", "namespace", hc.Namespace, "name", hc.Name)
