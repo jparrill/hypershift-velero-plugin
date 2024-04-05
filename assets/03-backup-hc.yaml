@@ -1,0 +1,33 @@
+---
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: csi-hc-backup
+  namespace: openshift-adp
+  labels:
+    velero.io/storage-location: default
+spec:
+  hooks: {}
+  includedNamespaces:
+  - clusters
+  - clusters-jparrill-hosted
+  includedResources:
+  - pv
+  - pvc
+  - hostedcluster
+  - nodepool
+  - secrets
+  - hostedcontrolplane
+  - cluster
+  - awscluster
+  - awsmachinetemplate
+  - awsmachine
+  - machinedeployment
+  - machineset
+  - machine
+  excludedResources: []
+  storageLocation: default
+  ttl: 720h0m0s
+  snapshotMoveData: true
+  datamover: "velero"
+

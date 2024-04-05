@@ -1,0 +1,16 @@
+---
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: csi-hc-restore
+  namespace: openshift-adp
+spec:
+  backupName: csi-hc-backup
+  existingResourcePolicy: update
+  excludedResources:
+  - nodes
+  - events
+  - events.events.k8s.io
+  - backups.velero.io
+  - restores.velero.io
+  - resticrepositories.velero.io
